@@ -10,15 +10,16 @@ LOST, TIE, WON = 0, .5, 1
 BEATS = {PAPER, SCISSORS, ROCK}
 
 local DEFAULT_ELO = 1200
-local K = 32
+local K = 512
 local ROUNDS = 150000
+local BANNED = {rando_bot = true}
 
 local function load_bots()
 	local bots = {}
 	local handle = assert(io.popen[[dir /b "bots\*_bot.lua"]])
 	for file in handle:lines() do
 		local name = file:match"(.+_bot)%.lua"
-		if name then
+		if name and not BANNED[name] then
 			local bot_path = "bots."..name
 			local ok, bot_data = pcall(require, bot_path)
 			if ok and type(bot_data) == "table" then
