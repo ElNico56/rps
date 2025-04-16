@@ -12,7 +12,12 @@ BEATS = {PAPER, SCISSORS, ROCK}
 local DEFAULT_ELO = 1200
 local K = 512
 local ROUNDS = 150000
-local BANNED = {rando_bot = true}
+local BANNED = {
+	rando_bot = true,
+	rock_bot = true,
+	paper_bot = true,
+	scissor_bot = true,
+}
 
 local function load_bots()
 	local bots = {}
@@ -82,18 +87,20 @@ local function match(botA, botB, rounds)
 end
 
 local function tournament(bots, rounds)
-	io.write"BOTS,"
+	local file = assert(io.open("results.csv", "w+"))
+	file:write"BOTS,"
 	for _, botA in ipairs(bots) do
-		io.write(botA.name, ",")
+		file:write(botA.name, ",")
 	end
-	io.write"\n"
+	file:write"\n"
 	for _, botA in ipairs(bots) do
-		io.write(botA.name, ",")
+		file:write(botA.name, ",")
 		for _, botB in ipairs(bots) do
-			io.write(match(botA, botB, rounds), ",")
+			file:write(match(botA, botB, rounds), ",")
 		end
-		io.write"\n"
+		file:write"\n"
 	end
+	file:close()
 end
 
 local function main()
@@ -111,20 +118,18 @@ local function main()
 		return a.elo > b.elo
 	end)
 
-	if arg[1] then
-		printf("Tournament with %d bots, %d rounds per match\n", #bots, ROUNDS)
-		printf("%-15s | %7s | %7s | %7s | %7s",
-			"Bot", "WINS", "DRAWS", "LOSES", "ELO")
-		print(
-			string.rep("-", 15).."-+-"..
-			string.rep("-", 7).."-+-"..
-			string.rep("-", 7).."-+-"..
-			string.rep("-", 7).."-+-"..
-			string.rep("-", 7))
-		for _, bot in ipairs(bots) do
-			printf("%-15s | %7d | %7d | %7d | %7.2f",
-				bot.name, bot.wins, bot.draws, bot.loses, bot.elo)
-		end
+	printf("Tournament with %d bots, %d rounds per match\n", #bots, ROUNDS)
+	printf("%-15s | %7s | %7s | %7s | %7s",
+		"Bot", "WINS", "DRAWS", "LOSES", "ELO")
+	print(
+		string.rep("-", 15).."-+-"..
+		string.rep("-", 7).."-+-"..
+		string.rep("-", 7).."-+-"..
+		string.rep("-", 7).."-+-"..
+		string.rep("-", 7))
+	for _, bot in ipairs(bots) do
+		printf("%-15s | %7d | %7d | %7d | %7.2f",
+			bot.name, bot.wins, bot.draws, bot.loses, bot.elo)
 	end
 end
 
